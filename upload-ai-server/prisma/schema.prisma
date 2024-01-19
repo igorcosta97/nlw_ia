@@ -11,7 +11,7 @@ model Video {
   id            String   @id @default(cuid())
   name          String
   path          String
-  transcription String?
+  transcription String?  @db.VarChar(8000)
   createdAt     DateTime @default(now())
 }
 

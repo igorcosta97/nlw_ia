@@ -3,5 +3,35 @@ GET http://localhost:3333/prompts
 
 ###
 
-# @name  GetAllPrompts
-GET http://localhost:3333/prompts
+# @name  uploadVideo
+POST http://localhost:3333/videos
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="exemplo.mp3"
+Content-Type: audio/mpeg
+
+< ./exemplo.mp3
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+# @name CreateTranscription
+POST http://localhost:3333/videos/clrl4g5v40000rx4vla88qmkt/transcription
+Content-Type: application/json
+
+{
+    "prompt": "Amor Livre, libertou, fanfic"
+}
+
+###
+
+# @name GenerateAICompletions
+POST http://localhost:3333/ai/generate
+Content-Type: application/json
+
+{
+    "videoId": "clrl4g5v40000rx4vla88qmkt",
+    "temperature": 0.9,
+    "template": "Gere um resumo da musica a seguir removendo partes repetidas: '''{transcription}'''"
+}
