@@ -1,13 +1,32 @@
-import { FileVideo, Github, Upload, Wand2 } from 'lucide-react'
+import { Github, Wand2 } from 'lucide-react'
 import { Button } from './components/ui/button'
 import { Separator } from './components/ui/separator'
 import { Textarea } from './components/ui/textarea'
 import { Label } from './components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select'
 import { Slider } from './components/ui/slider'
-
+import { VideoInputForm } from './components/video-input-from'
+import { PromptSelect } from './components/prompt-select'
+import { useState } from 'react'
+import { useCompletion } from 'ai/react'
 export function App() {
+  const [temperature, setTemperature] = useState(0.5)
+  const [videoId, setVideoId] = useState<string | null>(null)
 
+  const {
+    input,
+    setInput,
+    handleInputChange,
+    handleSubmit,
+    completion,
+    isLoading
+  } = useCompletion({
+    api:'http://localhost:3333/ai/generate',
+    body:{
+      videoId,
+      temperature,
+    }
+  })
   return (
     <div className='min-h-screen flex flex-col'>
       <div className='px-6 py-3 flex items-center justify-between border-b'>
@@ -27,11 +46,14 @@ export function App() {
             <Textarea 
               placeholder='Inclua o prompt para IA...' 
               className='resize-none p-4 leading-relaxed'
+              value={input}
+              onChange={handleInputChange}
             />
             <Textarea
               placeholder='Resultado gerado pela IA...' 
               readOnly
               className='resize-none p-4 leading-relaxed'
+              value={completion}
             />
           </div>
           <p className='text-muted-foreground text-sm'>
@@ -39,39 +61,12 @@ export function App() {
           </p>
         </div>
         <aside className='w-1/4 space-y-6'>
-          <form className='space-y-6'>
-            <label htmlFor='video' className='border flex rounded-md aspect-video cursor-pointer border-dashed text-sm flex-col gap-2 items-center justify-center text-muted-foreground hover:bg-primary/10'>
-              <FileVideo className='h-12 w-12'/>
-              Selecione um vídeo
-            </label>
-            <input type='file' id='video' accept='video/mp4' className='sr-only'></input>
-            <Separator/>
-            <div className='space-y-2'>
-              <Label htmlFor='transcription_prompt'>Prompt de transcrição</Label>
-              <Textarea id='transcription_prompt' className='h-24 resize-none leading-relaxed' placeholder='Inclua palavras-chave mencionadas no video separadas por virgula (,)'/>
-            </div>
-            <Button type='submit' className='w-full'>
-              Carregar Vídeo
-              <Upload className='h-4 w-4 ml-2'/>
-            </Button>
-          </form>
+          <VideoInputForm onVideoUploaded={setVideoId}/>
           <Separator/>
-          <form className='space-y-6'>
-          <div className='space-y-2'>
+          <form onSubmit={handleSubmit} className='space-y-6'>
+            <div className='space-y-2'>
               <Label>Prompt</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder='Selecione um prompt'/>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='title'>
-                    Título do youtube
-                  </SelectItem>
-                  <SelectItem value='description'>
-                    Descrição do youtube
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <PromptSelect onPromptSelected={setInput}/>
             </div>
             <Separator/>
             <div className='space-y-2'>
@@ -95,12 +90,13 @@ export function App() {
                 min={0}
                 max={1}
                 step={0.1}
-
+                value={[temperature]}
+                onValueChange={value => setTemperature(value[0])}
               />
               <span className='block text-xs text-muted-foreground italic leading-relaxed'>Valores mais altos tendem a deixar o resultado mais criativo, e com possíveis erros</span>
             </div>
             <Separator/>
-            <Button type='submit' className='w-full'>
+            <Button disabled={isLoading} type='submit' className='w-full'>
               Executar
               <Wand2 className='h-4 w-4 ml-2'/>
             </Button>
