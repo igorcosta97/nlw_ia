@@ -31,7 +31,7 @@ POST http://localhost:3333/ai/generate
 Content-Type: application/json
 
 {
-    "videoId": "clrl4g5v40000rx4vla88qmkt",
+    "videoId": "clrshtjcb0001cjam0d3vmkxt",
     "temperature": 0.9,
-    "template": "Gere um resumo da musica a seguir removendo partes repetidas: '''{transcription}'''"
+    "prompt": "Gere um resumo da musica a seguir removendo partes repetidas: '''{transcription}'''"
 }
